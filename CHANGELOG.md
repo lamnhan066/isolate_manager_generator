@@ -1,3 +1,7 @@
+## 0.1.0
+
+* Update analyzer dependency to ^7.0.0.
+
 ## 0.0.13
 
 * Fixed issue with incorrect parsing of Dart defines.
