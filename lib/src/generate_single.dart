@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:args/args.dart';
 import 'package:isolate_manager/isolate_manager.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
@@ -130,7 +130,7 @@ Future<Map<String, AnnotationResult>> _getAnotatedFunctions(String path) async {
         final annotationNameValue =
             _getIsolateManagerWorkerAnnotationValue(element);
         if (annotationNameValue != null) {
-          annotatedFunctions[element.name3!] = annotationNameValue;
+          annotatedFunctions[element.name!] = annotationNameValue;
         }
       }
     } else if (declaration is ClassDeclaration) {
@@ -141,7 +141,7 @@ Future<Map<String, AnnotationResult>> _getAnotatedFunctions(String path) async {
             final annotationNameValue =
                 _getIsolateManagerWorkerAnnotationValue(element);
             if (annotationNameValue != null) {
-              annotatedFunctions['${declaration.name}.${element.name3}'] =
+              annotatedFunctions['${declaration.name}.${element.name}'] =
                   annotationNameValue;
             }
           }
@@ -290,32 +290,32 @@ Future<void> _generateFromAnotatedFunction(List<dynamic> params) async {
   }
 }
 
-AnnotationResult? _getIsolateManagerWorkerAnnotationValue(Element2 element) {
+AnnotationResult? _getIsolateManagerWorkerAnnotationValue(Element element) {
   for (final metadata in element.fragments) {
     final annotationElement = metadata.element;
-    if (annotationElement is ConstructorElement2) {
-      final enclosingElement = annotationElement.enclosingElement2;
-      if (enclosingElement is ClassElement2) {
-        if (enclosingElement.name3 == classAnnotation) {
+    if (annotationElement is ConstructorElement) {
+      final enclosingElement = annotationElement.enclosingElement;
+      if (enclosingElement is ClassElement) {
+        if (enclosingElement.name == classAnnotation) {
           return AnnotationResult(
             workerName: '',
             isCustomWorker: false,
           );
-        } else if (enclosingElement.name3 == classCustomWorkerAnnotation) {
+        } else if (enclosingElement.name == classCustomWorkerAnnotation) {
           return AnnotationResult(
             workerName: '',
             isCustomWorker: true,
           );
         }
       }
-    } else if (annotationElement is PropertyAccessorElement2) {
-      final variable = annotationElement.variable3;
-      if (variable?.name3 == constAnnotation) {
+    } else if (annotationElement is PropertyAccessorElement) {
+      final variable = annotationElement.variable;
+      if (variable?.name == constAnnotation) {
         return AnnotationResult(
           workerName: '',
           isCustomWorker: false,
         );
-      } else if (variable?.name3 == constCustomWorkerAnnotation) {
+      } else if (variable?.name == constCustomWorkerAnnotation) {
         return AnnotationResult(
           workerName: '',
           isCustomWorker: true,

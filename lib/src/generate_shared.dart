@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:args/args.dart';
 import 'package:isolate_manager/isolate_manager.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
@@ -128,7 +128,7 @@ Future<Map<String, String>> _getAnotatedFunctions(String path) async {
       if (element != null) {
         final isValidAnnotation = _checkAnnotation(element);
         if (isValidAnnotation) {
-          annotatedFunctions[element.name3!] = p.relative(sourceFilePath);
+          annotatedFunctions[element.name!] = p.relative(sourceFilePath);
         }
       }
     } else if (declaration is ClassDeclaration) {
@@ -138,7 +138,7 @@ Future<Map<String, String>> _getAnotatedFunctions(String path) async {
           if (element != null) {
             final isValidAnnotation = _checkAnnotation(element);
             if (isValidAnnotation) {
-              annotatedFunctions['${declaration.name}.${element.name3}'] =
+              annotatedFunctions['${declaration.name}.${element.name}'] =
                   p.relative(sourceFilePath);
             }
           }
@@ -256,12 +256,12 @@ Future<void> _generateFromAnotatedFunctions(
   }
 }
 
-bool _checkAnnotation(Element2 element) {
+bool _checkAnnotation(Element element) {
   for (final metadata in element.fragments) {
     final annotationElement = metadata.element;
-    if (annotationElement is PropertyAccessorElement2) {
-      final variable = annotationElement.variable3;
-      if (variable?.name3 == _constAnnotation) {
+    if (annotationElement is PropertyAccessorElement) {
+      final variable = annotationElement.variable;
+      if (variable?.name == _constAnnotation) {
         return true;
       }
     }
