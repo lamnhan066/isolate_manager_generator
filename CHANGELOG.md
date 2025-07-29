@@ -1,3 +1,7 @@
+## 0.2.0-rc
+
+* Update analyzer dependency to ^8.0.0.
+
 ## 0.1.0
 
 * Update analyzer dependency to ^7.0.0.
