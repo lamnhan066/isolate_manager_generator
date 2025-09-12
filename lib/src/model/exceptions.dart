@@ -1,11 +1,11 @@
 /// Base exception class for all Isolate Manager Generator exceptions.
 /// All specific exceptions in the library should extend this class.
 sealed class IMGException implements Exception {
-  /// The error message describing the exception.
-  final String message;
 
   /// Creates a new exception with the specified error message.
   const IMGException(this.message);
+  /// The error message describing the exception.
+  final String message;
 
   @override
   String toString() => 'IsolateManagerGeneratorException: $message';
@@ -40,12 +40,12 @@ class IMGMainFunctionHasNoOpenBracesException extends IMGException {
 
 /// Exception thrown when a file specified in the configuration cannot be found.
 class IMGFileNotFoundException extends IMGException {
-  /// The path to the file that was not found.
-  final String filePath;
 
   /// Creates a new exception indicating that a file was not found at the specified path.
   ///
   /// [filePath] is the path to the file that couldn't be located.
   const IMGFileNotFoundException(this.filePath)
       : super('File not found: $filePath');
+  /// The path to the file that was not found.
+  final String filePath;
 }

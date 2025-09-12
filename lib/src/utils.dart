@@ -6,7 +6,10 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
 import 'package:path/path.dart' as p;
 
+/// Prints debug information if in debug mode
 void printDebug(Object? Function() log) {
+  // Print the log message
+  // ignore: avoid_print
   print(log());
 }
 
@@ -16,7 +19,7 @@ Future<List<String>> readFileLines(String path) async {
   if (!file.existsSync()) {
     throw IMGFileNotFoundException(path);
   }
-  return await file.readAsLines();
+  return file.readAsLines();
 }
 
 /// Writes content to a file
@@ -31,7 +34,7 @@ List<String> addImportStatements(
   String sourceFilePath,
   String mainPath,
 ) {
-  var result = List<String>.from(content);
+  final result = List<String>.from(content);
   var lastImportIndex = -1;
   for (var i = 0; i < result.length; i++) {
     if (result[i].startsWith('import ')) {
@@ -72,7 +75,7 @@ List<String> addImportStatements(
 
 /// Adds the worker mappings call to the main function
 List<String> addWorkerMappingsCall(List<String> content) {
-  var result = List<String>.from(content);
+  final result = List<String>.from(content);
   var mainIndex = -1;
   for (var i = 0; i < result.length; i++) {
     if (result[i].contains('void main(') ||
@@ -83,7 +86,7 @@ List<String> addWorkerMappingsCall(List<String> content) {
   }
 
   if (mainIndex == -1) {
-    throw IMGNoMainFunctionFoundException();
+    throw const IMGNoMainFunctionFoundException();
   }
 
   var insertionIndex = mainIndex;
@@ -93,7 +96,7 @@ List<String> addWorkerMappingsCall(List<String> content) {
   }
 
   if (insertionIndex == result.length) {
-    throw IMGMainFunctionHasNoOpenBracesException();
+    throw const IMGMainFunctionHasNoOpenBracesException();
   }
 
   const addWorkerMappingsCall = '  _addWorkerMappings();';
@@ -110,7 +113,7 @@ List<String> addOrUpdateWorkerMappingsFunction(
   String functionName,
   String subPath,
 ) {
-  var result = List<String>.from(content);
+  final result = List<String>.from(content);
   // We don't need to set the right separator here, the `IsolateManager.addWorkerMapping`
   // method will handle it.
   final functionPath = subPath == '' ? functionName : '$subPath/$functionName';
@@ -139,11 +142,12 @@ List<String> addOrUpdateWorkerMappingsFunction(
       final line = result[addWorkerMappingsIndex].replaceAll(' ', '');
       if (line.startsWith('void_addWorkerMappings(){}')) {
         result[addWorkerMappingsIndex] = 'void _addWorkerMappings() {';
-        result.insert(addWorkerMappingsIndex + 1, newWorkerMappingLine);
-        result.insert(addWorkerMappingsIndex + 2, '}');
+        result
+          ..insert(addWorkerMappingsIndex + 1, newWorkerMappingLine)
+          ..insert(addWorkerMappingsIndex + 2, '}');
       } else {
         // Find the closing brace of the function
-        int closingBraceIndex = addWorkerMappingsIndex + 1;
+        var closingBraceIndex = addWorkerMappingsIndex + 1;
         while (closingBraceIndex < result.length &&
             !result[closingBraceIndex].trim().startsWith('}')) {
           closingBraceIndex++;
@@ -156,6 +160,7 @@ List<String> addOrUpdateWorkerMappingsFunction(
   return result;
 }
 
+/// Adds a worker mapping to the specified source file.
 Future<void> addWorkerMappingToSourceFile(
   String workerMappingsPath,
   String sourceFilePath,
@@ -182,15 +187,17 @@ Future<void> addWorkerMappingToSourceFile(
   );
 }
 
+/// Parses command-line arguments into main arguments and Dart VM arguments.
 ({List<String> mainArgs, List<String> dartArgs}) parseArgs(List<String> args) {
-  final separator = args.indexOf('--');
-  List<String> dartArgs = [];
+  var effectiveArgs = List<String>.from(args);
+  final separator = effectiveArgs.indexOf('--');
+  var dartArgs = <String>[];
   if (separator != -1) {
-    dartArgs = args.sublist(separator + 1);
-    args = args.sublist(0, separator);
+    dartArgs = effectiveArgs.sublist(separator + 1);
+    effectiveArgs = effectiveArgs.sublist(0, separator);
   }
 
-  return (mainArgs: args, dartArgs: dartArgs);
+  return (mainArgs: effectiveArgs, dartArgs: dartArgs);
 }
 
 /// Parses a Dart file to find methods annotated with specific annotations.
@@ -198,14 +205,14 @@ Future<Map<String, List<String>>> parseAnnotations(
   String filePath,
   List<String> annotations,
 ) async {
-  filePath = p.absolute(filePath);
+  final effectivePath = p.absolute(filePath);
 
   // Check if the file exists.
-  if (!File(filePath).existsSync()) {
-    throw FileSystemException("File not found at: $filePath");
+  if (!File(effectivePath).existsSync()) {
+    throw FileSystemException('File not found at: $effectivePath');
   }
 
-  final result = await resolveFile(path: filePath);
+  final result = await resolveFile(path: effectivePath);
 
   // Ensure the result is a ResolvedUnitResult and not an error.
   if (result is! ResolvedUnitResult) {

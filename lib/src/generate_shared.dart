@@ -31,7 +31,8 @@ Future<void> generate(
   final isWorkerMappings = argResults['worker-mappings-experiment'] as String;
   final subDir = argResults['sub-path'] as String;
 
-  print('Parsing the `IsolateManagerWorker` inside directory: $input...');
+  printDebug(
+      () => 'Parsing the `IsolateManagerWorker` inside directory: $input...');
 
   final sharedIsolates = IsolateManager.createShared(
     concurrent: Platform.numberOfProcessors,
@@ -41,22 +42,24 @@ Future<void> generate(
 
   await Future.wait([
     for (final file in dartFiles)
-      sharedIsolates.compute(checkAndCollectAnnotatedFiles, file).then((value) {
+      sharedIsolates
+          .compute(_checkAndCollectAnnotatedFiles, file)
+          .then((value) {
         if (value.isNotEmpty) {
           params.add([value]);
         }
       }),
   ]);
 
-  print('Total files to generate: ${params.length}');
+  printDebug(() => 'Total files to generate: ${params.length}');
 
   final anotatedFunctions = <String, String>{};
-  int counter = 0;
+  var counter = 0;
   await Future.wait(
     [
       for (final param in params)
         sharedIsolates
-            .compute(getAndGenerateFromAnotatedFunctions, param)
+            .compute(_getAndGenerateFromAnotatedFunctions, param)
             .then((value) {
           counter += value.length;
           anotatedFunctions.addAll(value);
@@ -65,7 +68,7 @@ Future<void> generate(
   );
 
   if (anotatedFunctions.isNotEmpty) {
-    await generateFromAnotatedFunctions(
+    await _generateFromAnnotatedFunctions(
       anotatedFunctions,
       obfuscate,
       isDebug,
@@ -78,40 +81,40 @@ Future<void> generate(
     );
   }
 
-  print('Total generated functions: $counter');
+  printDebug(() => 'Total generated functions: $counter');
 
   await sharedIsolates.stop();
-  print('Done');
+  printDebug(() => 'Done');
 }
 
-Future<String> checkAndCollectAnnotatedFiles(File file) async {
+Future<String> _checkAndCollectAnnotatedFiles(File file) async {
   final filePath = p.absolute(file.path);
   final content = file.readAsStringSync();
-  if (containsAnnotations(content)) {
+  if (_containsAnnotations(content)) {
     return filePath;
   }
   return '';
 }
 
-bool containsAnnotations(String content) {
+bool _containsAnnotations(String content) {
   return content.contains(_sharedAnnotations);
 }
 
-Future<Map<String, String>> getAndGenerateFromAnotatedFunctions(
+Future<Map<String, String>> _getAndGenerateFromAnotatedFunctions(
   List<dynamic> params,
 ) async {
-  final String filePath = params[0];
+  final filePath = params[0] as String;
 
-  return getAnotatedFunctions(filePath);
+  return _getAnnotatedFunctions(filePath);
 }
 
-Future<Map<String, String>> getAnotatedFunctions(String path) async {
+Future<Map<String, String>> _getAnnotatedFunctions(String path) async {
   final annotations = await parseAnnotations(path, [_constAnnotation]);
   final relativePath = p.relative(path);
 
   final annotatedFunctions = <String, String>{};
   for (final entry in annotations.entries) {
-    for (var functionName in entry.value) {
+    for (final functionName in entry.value) {
       annotatedFunctions[functionName] = relativePath;
     }
   }
@@ -119,7 +122,7 @@ Future<Map<String, String>> getAnotatedFunctions(String path) async {
   return annotatedFunctions;
 }
 
-Future<void> generateFromAnotatedFunctions(
+Future<void> _generateFromAnnotatedFunctions(
   Map<String, String> anotatedFunctions,
   String obfuscate,
   bool isDebug,
@@ -136,11 +139,11 @@ Future<void> generateFromAnotatedFunctions(
   final outputPath = p.join(output, '$name.$extension');
   final outputFile = File(outputPath);
   final backupOutputData =
-      await outputFile.exists() ? await outputFile.readAsString() : '';
+      outputFile.existsSync() ? await outputFile.readAsString() : '';
 
   try {
-    final sink = file.openWrite();
-    sink.writeln("import 'package:isolate_manager/isolate_manager.dart';");
+    final sink = file.openWrite()
+      ..writeln("import 'package:isolate_manager/isolate_manager.dart';");
     for (final function in anotatedFunctions.entries) {
       final path = p.relative(function.value);
       sink.writeln("import '${path.replaceAll(p.separator, '/')}';");
@@ -149,19 +152,20 @@ Future<void> generateFromAnotatedFunctions(
     for (final function in anotatedFunctions.entries) {
       sink.writeln("'${function.key}' : ${function.key},");
     }
-    sink.writeln('};');
-    sink.writeln('main() {');
-    sink.writeln('  IsolateManagerFunction.sharedWorkerFunction(map);');
-    sink.writeln('}');
+    sink
+      ..writeln('};')
+      ..writeln('main() {')
+      ..writeln('  IsolateManagerFunction.sharedWorkerFunction(map);')
+      ..writeln('}');
     await sink.close();
 
-    if (await outputFile.exists()) {
+    if (outputFile.existsSync()) {
       await outputFile.delete();
     }
 
     final dartPath = Platform.resolvedExecutable;
     if (dartPath.isEmpty) {
-      throw IMGFileNotFoundException('Dart SDK not found');
+      throw const IMGFileNotFoundException('Dart SDK not found');
     }
 
     final process = Process.run(
@@ -181,14 +185,14 @@ Future<void> generateFromAnotatedFunctions(
 
     if (isDebug) {
       process.asStream().listen((data) {
-        print(data.stdout);
+        printDebug(() => data.stdout);
       });
     }
 
     final result = await process;
 
-    if (await outputFile.exists()) {
-      print('Compiled: ${p.relative(outputPath)}');
+    if (outputFile.existsSync()) {
+      printDebug(() => 'Compiled: ${p.relative(outputPath)}');
       if (!isDebug) {
         if (isWasm) {
           await File(p.join(output, '$name.unopt.wasm')).delete();
@@ -197,12 +201,12 @@ Future<void> generateFromAnotatedFunctions(
         }
       }
     } else {
-      print('Compile ERROR: ${p.relative(outputPath)}');
+      printDebug(() => 'Compile ERROR: ${p.relative(outputPath)}');
       final r = result.stdout.toString().split('\n');
-      for (var element in r) {
-        print('   > $element');
+      for (final element in r) {
+        printDebug(() => '   > $element');
       }
-      throw IMGCompileErrorException();
+      throw const IMGCompileErrorException();
     }
 
     if (workerMappingsPath.isNotEmpty) {
@@ -219,7 +223,7 @@ Future<void> generateFromAnotatedFunctions(
     }
   } catch (e) {
     // Restore the backup data if the compilation fails
-    if (backupOutputData.isNotEmpty && !await outputFile.exists()) {
+    if (backupOutputData.isNotEmpty && !outputFile.existsSync()) {
       await outputFile.writeAsString(backupOutputData);
     }
     rethrow;

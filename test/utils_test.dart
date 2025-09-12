@@ -32,7 +32,7 @@ void main() {
 
     test('throws exception if file does not exist', () async {
       expect(
-        () async => await readFileLines('non_existent_file.txt'),
+        () async => readFileLines('non_existent_file.txt'),
         throwsA(
           isA<IMGFileNotFoundException>().having(
             (e) => e.filePath,
@@ -166,8 +166,8 @@ void main() {
 
     test('relative import from `lib`', () {
       final content = ['import "dart:io";', 'void main() {}'];
-      final sourceFilePath = 'lib/src/worker.dart';
-      final mainPath = 'lib/main.dart';
+      const sourceFilePath = 'lib/src/worker.dart';
+      const mainPath = 'lib/main.dart';
 
       final result = addImportStatements(content, sourceFilePath, mainPath);
 
@@ -177,8 +177,8 @@ void main() {
 
     test('relative import from non-lib directory', () {
       final content = ['import "dart:io";', 'void main() {}'];
-      final sourceFilePath = 'lib/src/worker.dart';
-      final mainPath = 'lib/pages/main.dart';
+      const sourceFilePath = 'lib/src/worker.dart';
+      const mainPath = 'lib/pages/main.dart';
 
       final result = addImportStatements(content, sourceFilePath, mainPath);
 

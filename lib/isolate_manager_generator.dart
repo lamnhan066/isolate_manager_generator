@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:isolate_manager/isolate_manager.dart';
+import 'package:isolate_manager_generator/src/generate_shared.dart' as shared;
+import 'package:isolate_manager_generator/src/generate_single.dart' as single;
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
 import 'package:isolate_manager_generator/src/utils.dart';
 import 'package:path/path.dart';
 
-import 'src/generate_shared.dart' as shared;
-import 'src/generate_single.dart' as single;
-
+/// A utility class for generating isolate manager workers.
 class IsolateManagerGenerator {
   /// Executes the isolate manager generator with the provided arguments.
   ///
@@ -26,7 +26,7 @@ class IsolateManagerGenerator {
     try {
       await _execute(args);
     } on IMGException catch (e) {
-      print(e.message);
+      printDebug(() => e.message);
       switch (e) {
         case IMGCompileErrorException():
           return 1;
@@ -49,12 +49,10 @@ class IsolateManagerGenerator {
     final parser = ArgParser()
       ..addFlag(
         'single',
-        defaultsTo: false,
         help: 'Generate the single Workers',
       )
       ..addFlag(
         'shared',
-        defaultsTo: false,
         help: 'Generate the shared Workers',
       )
       ..addOption(
@@ -84,13 +82,11 @@ class IsolateManagerGenerator {
       )
       ..addFlag(
         'debug',
-        defaultsTo: false,
         help:
             'Export the debug files like *.js.deps, *.js.map and *.unopt.wasm',
       )
       ..addFlag(
         'wasm',
-        defaultsTo: false,
         help: 'Compile to wasm',
       )
       ..addOption(
@@ -103,7 +99,7 @@ class IsolateManagerGenerator {
       ..addOption(
         'sub-path',
         help:
-            'Sub-path of the function name when generate the worker-mappings (apply only for the single functions). It\'s different from the `output` path.',
+            "Sub-path of the function name when generate the worker-mappings (apply only for the single functions). It's different from the `output` path.",
         defaultsTo: '',
         aliases: ['sub-dir'],
       );
@@ -111,12 +107,12 @@ class IsolateManagerGenerator {
     final argResults = parser.parse(parsedArgs.mainArgs);
 
     if (argResults['help'] as bool) {
-      print(parser.usage);
+      printDebug(() => parser.usage);
       return;
     }
 
-    bool isSingle = argResults['single'] as bool;
-    bool isShared = argResults['shared'] as bool;
+    var isSingle = argResults['single'] as bool;
+    var isShared = argResults['shared'] as bool;
 
     if (!isSingle && !isShared) {
       isSingle = true;
@@ -126,25 +122,26 @@ class IsolateManagerGenerator {
     final input = argResults['input'] as String;
     final dir = Directory(input);
     if (!dir.existsSync()) {
-      print('The command run in the wrong directory.');
+      printDebug(() => 'The command run in the wrong directory.');
       return;
     }
 
-    final List<File> dartFiles = listDartFiles(Directory(input), []);
+    final dartFiles = listDartFiles(Directory(input), []);
 
     if (isSingle) {
-      print('>> Generating the single Workers...');
+      printDebug(() => '>> Generating the single Workers...');
       await single.generate(argResults, parsedArgs.dartArgs, dartFiles);
-      print('>> Generated.');
+      printDebug(() => '>> Generated.');
     }
 
     if (isShared) {
-      print('>> Generating the shared Worker...');
+      printDebug(() => '>> Generating the shared Worker...');
       await shared.generate(argResults, parsedArgs.dartArgs, dartFiles);
-      print('>> Generated.');
+      printDebug(() => '>> Generated.');
     }
   }
 
+  /// Lists all Dart files in the given directory and its subdirectories.
   static List<File> listDartFiles(
     Directory dir,
     List<File> fileList,
