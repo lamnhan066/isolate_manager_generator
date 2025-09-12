@@ -159,8 +159,13 @@ Future<void> generateFromAnotatedFunctions(
       await outputFile.delete();
     }
 
+    final dartPath = Platform.resolvedExecutable;
+    if (dartPath.isEmpty) {
+      throw IMGFileNotFoundException('Dart SDK not found');
+    }
+
     final process = Process.run(
-      'dart',
+      dartPath,
       [
         'compile',
         extension,
