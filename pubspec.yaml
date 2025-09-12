@@ -7,7 +7,7 @@ environment:
   sdk: ^3.4.0
 
 dependencies:
-  analyzer: ^8.0.0
+  analyzer: ^8.1.0
   args: ^2.5.0
   path: ^1.9.0
   isolate_manager: ">=5.7.1 <7.0.0"
