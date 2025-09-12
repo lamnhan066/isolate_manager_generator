@@ -1,13 +1,13 @@
 name: isolate_manager_generator
 description: "The generator for the isolate_manager"
-version: 0.2.0
+version: 0.1.1
 homepage: https://github.com/lamnhan066/isolate_manager_generator
 
 environment:
   sdk: ^3.4.0
 
 dependencies:
-  analyzer: ^8.1.0
+  analyzer: ^7.7.1
   args: ^2.5.0
   isolate_manager: ">=5.7.1 <7.0.0"
   path: ^1.9.0

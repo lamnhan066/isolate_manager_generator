@@ -212,7 +212,7 @@ Future<Map<String, List<String>>> parseAnnotations(
     throw FileSystemException('File not found at: $effectivePath');
   }
 
-  final result = await resolveFile(path: effectivePath);
+  final result = await resolveFile2(path: effectivePath);
 
   // Ensure the result is a ResolvedUnitResult and not an error.
   if (result is! ResolvedUnitResult) {
@@ -220,33 +220,33 @@ Future<Map<String, List<String>>> parseAnnotations(
   }
 
   final annotatedMethods = <String, List<String>>{};
-  final library = result.libraryElement;
+  final library = result.libraryElement2;
 
   // Iterate over all top-level functions in the library's defining unit.
   for (final function in library.topLevelFunctions) {
     final foundAnnotations = _containedAnnotations(
-      function.metadata.annotations,
+      function.metadata2.annotations,
       annotations,
     );
     for (final annotation in foundAnnotations) {
       annotatedMethods
           .putIfAbsent(annotation, () => [])
-          .add(function.name.toString());
+          .add(function.name3.toString());
     }
   }
 
   // Iterate over all classes in the library's defining unit.
   for (final classElement in library.classes) {
     // Iterate over all methods within the class.
-    for (final method in classElement.methods) {
+    for (final method in classElement.methods2) {
       final foundAnnotations = _containedAnnotations(
-        method.metadata.annotations,
+        method.metadata2.annotations,
         annotations,
       );
       for (final annotation in foundAnnotations) {
         annotatedMethods
             .putIfAbsent(annotation, () => [])
-            .add('${classElement.name}.${method.name}');
+            .add('${classElement.name3}.${method.name3}');
       }
     }
   }
