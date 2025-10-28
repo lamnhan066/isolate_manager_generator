@@ -32,7 +32,8 @@ Future<void> generate(
   final subDir = argResults['sub-path'] as String;
 
   printDebug(
-      () => 'Parsing the `IsolateManagerWorker` inside directory: $input...');
+    () => 'Parsing the `IsolateManagerWorker` inside directory: $input...',
+  );
 
   final sharedIsolates = IsolateManager.createShared(
     concurrent: Platform.numberOfProcessors,
@@ -42,9 +43,9 @@ Future<void> generate(
 
   await Future.wait([
     for (final file in dartFiles)
-      sharedIsolates
-          .compute(_checkAndCollectAnnotatedFiles, file)
-          .then((value) {
+      sharedIsolates.compute(_checkAndCollectAnnotatedFiles, file).then((
+        value,
+      ) {
         if (value.isNotEmpty) {
           params.add([value]);
         }
@@ -61,9 +62,9 @@ Future<void> generate(
         sharedIsolates
             .compute(_getAndGenerateFromAnotatedFunctions, param)
             .then((value) {
-          counter += value.length;
-          anotatedFunctions.addAll(value);
-        }),
+              counter += value.length;
+              anotatedFunctions.addAll(value);
+            }),
     ],
   );
 
@@ -133,13 +134,18 @@ Future<void> _generateFromAnnotatedFunctions(
   String workerMappingsPath,
   String subPath,
 ) async {
-  final file = File(p.join(
-      p.current, '.IsolateManagerShared.${anotatedFunctions.hashCode}.dart'));
+  final file = File(
+    p.join(
+      p.current,
+      '.IsolateManagerShared.${anotatedFunctions.hashCode}.dart',
+    ),
+  );
   final extension = isWasm ? 'wasm' : 'js';
   final outputPath = p.join(output, '$name.$extension');
   final outputFile = File(outputPath);
-  final backupOutputData =
-      outputFile.existsSync() ? await outputFile.readAsString() : '';
+  final backupOutputData = outputFile.existsSync()
+      ? await outputFile.readAsString()
+      : '';
 
   try {
     final sink = file.openWrite()

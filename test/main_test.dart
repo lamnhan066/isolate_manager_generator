@@ -7,8 +7,10 @@ void main() {
   group('Main test', () {
     test('listDartFiles', () {
       final files = <File>[];
-      final dartFiles =
-          IsolateManagerGenerator.listDartFiles(Directory('test'), files);
+      final dartFiles = IsolateManagerGenerator.listDartFiles(
+        Directory('test'),
+        files,
+      );
 
       expect(dartFiles.length, greaterThan(1));
     });

@@ -1,3 +1,10 @@
+## 0.3.0
+
+* Update to support Dart SDK `^3.9.0`.
+* Update `analyzer` dependency to `^8.4.0`.
+* Update `isolate_manager` to `^6.1.2`.
+* Update `very_good_analysis` to `^10.0.0` in dev dependencies.
+
 ## 0.2.0
 
 * Update analyzer dependency to `^8.1.0`.

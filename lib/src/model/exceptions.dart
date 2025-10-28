@@ -21,21 +21,21 @@ class IMGCompileErrorException extends IMGException {
 class IMGUnableToResolvingFileException extends IMGException {
   /// Creates a new exception with the specified file path that could not be resolved.
   const IMGUnableToResolvingFileException(String filePath)
-      : super('Unable to resolving file: $filePath');
+    : super('Unable to resolving file: $filePath');
 }
 
 /// Exception thrown when no main function is found in the processed source file.
 class IMGNoMainFunctionFoundException extends IMGException {
   /// Creates a new exception indicating that no main function was found.
   const IMGNoMainFunctionFoundException()
-      : super('No main function found in the source file.');
+    : super('No main function found in the source file.');
 }
 
 /// Exception thrown when the main function's syntax is invalid (missing opening brace).
 class IMGMainFunctionHasNoOpenBracesException extends IMGException {
   /// Creates a new exception indicating that the main function is missing opening braces.
   const IMGMainFunctionHasNoOpenBracesException()
-      : super('Malformed main function, no opening brace found.');
+    : super('Malformed main function, no opening brace found.');
 }
 
 /// Exception thrown when a file specified in the configuration cannot be found.
@@ -44,7 +44,7 @@ class IMGFileNotFoundException extends IMGException {
   ///
   /// [filePath] is the path to the file that couldn't be located.
   const IMGFileNotFoundException(this.filePath)
-      : super('File not found: $filePath');
+    : super('File not found: $filePath');
 
   /// The path to the file that was not found.
   final String filePath;

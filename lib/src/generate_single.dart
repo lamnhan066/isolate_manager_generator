@@ -46,9 +46,9 @@ Future<void> generate(
   await Future.wait(
     [
       for (final file in dartFiles)
-        _sharedIsolates
-            .compute(_checkAndCollectAnnotatedFiles, file)
-            .then((value) {
+        _sharedIsolates.compute(_checkAndCollectAnnotatedFiles, file).then((
+          value,
+        ) {
           if (value.isNotEmpty) {
             params.add([
               value,
@@ -175,8 +175,9 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
   final name = function.key;
   final outputPath = p.join(output, '$name.$extension');
   final outputFile = File(outputPath);
-  final backupOutputData =
-      outputFile.existsSync() ? await outputFile.readAsString() : '';
+  final backupOutputData = outputFile.existsSync()
+      ? await outputFile.readAsString()
+      : '';
 
   try {
     final sink = file.openWrite()
@@ -228,7 +229,8 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
 
     if (outputFile.existsSync()) {
       printDebug(
-        () => 'Path: ${p.relative(sourceFilePath)} => '
+        () =>
+            'Path: ${p.relative(sourceFilePath)} => '
             'Function: ${function.key} => Compiled: ${p.relative(outputPath)}',
       );
       if (!isDebug) {
@@ -240,7 +242,8 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
       }
     } else {
       printDebug(
-        () => 'Path: ${p.relative(sourceFilePath)} => Function: '
+        () =>
+            'Path: ${p.relative(sourceFilePath)} => Function: '
             '${function.key} => Compile ERROR: ${p.relative(outputPath)}',
       );
       final r = result.stdout.toString().split('\n');

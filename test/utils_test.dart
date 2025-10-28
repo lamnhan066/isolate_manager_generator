@@ -9,7 +9,9 @@ void main() {
   group('printDebug', () {
     test('prints message', () {
       expect(
-          () => printDebug(() => 'debug message'), prints('debug message\n'));
+        () => printDebug(() => 'debug message'),
+        prints('debug message\n'),
+      );
     });
 
     test('handles null message', () {
@@ -47,8 +49,10 @@ void main() {
       final file = File(tempFilePath);
       await file.writeAsString('line1\nline2\nline3');
 
-      expect(await readFileLines(tempFilePath),
-          equals(['line1', 'line2', 'line3']));
+      expect(
+        await readFileLines(tempFilePath),
+        equals(['line1', 'line2', 'line3']),
+      );
     });
 
     test('handles empty file', () async {
@@ -100,34 +104,48 @@ void main() {
   group('addImportStatements', () {
     test('adds isolate_manager import when not present', () {
       final content = ['import "dart:io";', 'void main() {}'];
-      final result =
-          addImportStatements(content, 'lib/src/file.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/file.dart',
+        'lib/main.dart',
+      );
 
-      expect(result,
-          contains("import 'package:isolate_manager/isolate_manager.dart';"));
+      expect(
+        result,
+        contains("import 'package:isolate_manager/isolate_manager.dart';"),
+      );
     });
 
     test('does not add duplicate isolate_manager import', () {
       final content = [
         'import "dart:io";',
         "import 'package:isolate_manager/isolate_manager.dart';",
-        'void main() {}'
+        'void main() {}',
       ];
-      final result =
-          addImportStatements(content, 'lib/src/file.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/file.dart',
+        'lib/main.dart',
+      );
 
       expect(
-          result
-              .where((l) =>
-                  l == "import 'package:isolate_manager/isolate_manager.dart';")
-              .length,
-          equals(1));
+        result
+            .where(
+              (l) =>
+                  l == "import 'package:isolate_manager/isolate_manager.dart';",
+            )
+            .length,
+        equals(1),
+      );
     });
 
     test('adds source file import when necessary', () {
       final content = ['import "dart:io";', 'void main() {}'];
-      final result =
-          addImportStatements(content, 'lib/src/worker.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/worker.dart',
+        'lib/main.dart',
+      );
 
       expect(result, contains("import 'src/worker.dart';"));
     });
@@ -135,33 +153,46 @@ void main() {
     test('does not add source file import when source is main', () {
       final content = ['import "dart:io";', 'void main() {}'];
       final result = addImportStatements(
-          content, p.absolute('lib/main.dart'), p.absolute('lib/main.dart'));
+        content,
+        p.absolute('lib/main.dart'),
+        p.absolute('lib/main.dart'),
+      );
 
       expect(result.any((l) => l.contains("import 'main.dart';")), isFalse);
     });
 
     test('handles content with no imports', () {
       final content = ['void main() {}'];
-      final result =
-          addImportStatements(content, 'lib/src/file.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/file.dart',
+        'lib/main.dart',
+      );
 
-      expect(result[0],
-          equals("import 'package:isolate_manager/isolate_manager.dart';"));
+      expect(
+        result[0],
+        equals("import 'package:isolate_manager/isolate_manager.dart';"),
+      );
     });
 
     test('preserves order of existing imports', () {
       final content = [
         'import "dart:io";',
         'import "dart:async";',
-        'void main() {}'
+        'void main() {}',
       ];
-      final result =
-          addImportStatements(content, 'lib/src/file.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/file.dart',
+        'lib/main.dart',
+      );
 
       expect(result[0], equals('import "dart:io";'));
       expect(result[1], equals('import "dart:async";'));
-      expect(result[2],
-          equals("import 'package:isolate_manager/isolate_manager.dart';"));
+      expect(
+        result[2],
+        equals("import 'package:isolate_manager/isolate_manager.dart';"),
+      );
     });
 
     test('relative import from `lib`', () {
@@ -189,14 +220,18 @@ void main() {
       final content = [
         'import "dart:io";',
         "import 'src/worker.dart';",
-        'void main() {}'
+        'void main() {}',
       ];
-      final result =
-          addImportStatements(content, 'lib/src/worker.dart', 'lib/main.dart');
+      final result = addImportStatements(
+        content,
+        'lib/src/worker.dart',
+        'lib/main.dart',
+      );
 
       expect(
-          result.where((l) => l.contains("import 'src/worker.dart';")).length,
-          equals(1));
+        result.where((l) => l.contains("import 'src/worker.dart';")).length,
+        equals(1),
+      );
     });
   });
 
@@ -213,12 +248,14 @@ void main() {
         'void main() {',
         '  _addWorkerMappings();',
         '  print("hello");',
-        '}'
+        '}',
       ];
       final result = addWorkerMappingsCall(content);
 
-      expect(result.where((l) => l.contains('_addWorkerMappings();')).length,
-          equals(1));
+      expect(
+        result.where((l) => l.contains('_addWorkerMappings();')).length,
+        equals(1),
+      );
     });
 
     test('handles multi-line main function declaration', () {
@@ -254,7 +291,7 @@ void main() {
       final content = [
         'void main(List<String> args) {',
         '  print("hello");',
-        '}'
+        '}',
       ];
       final result = addWorkerMappingsCall(content);
 
@@ -272,25 +309,35 @@ void main() {
   group('addOrUpdateWorkerMappingsFunction', () {
     test('adds new worker mappings function if none exists', () {
       final content = ['void main() {}'];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', 'subDir');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        'subDir',
+      );
 
       expect(result, contains('void _addWorkerMappings() {'));
       expect(
-          result,
-          contains(
-              "  IsolateManager.addWorkerMapping(myFunction, 'subDir/myFunction');"));
+        result,
+        contains(
+          "  IsolateManager.addWorkerMapping(myFunction, 'subDir/myFunction');",
+        ),
+      );
     });
 
     test('updates existing empty worker mappings function', () {
       final content = ['void main() {}', 'void _addWorkerMappings() {}'];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(
-          result.join('\n'),
-          contains(
-              "void _addWorkerMappings() {\n  IsolateManager.addWorkerMapping(myFunction, 'myFunction');"));
+        result.join('\n'),
+        contains(
+          "void _addWorkerMappings() {\n  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
+        ),
+      );
     });
 
     test('adds to existing worker mappings function', () {
@@ -298,19 +345,26 @@ void main() {
         'void main() {}',
         'void _addWorkerMappings() {',
         "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
-        '}'
+        '}',
       ];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(
-          result,
-          contains(
-              "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');"));
+        result,
+        contains(
+          "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
+        ),
+      );
       expect(
-          result,
-          contains(
-              "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');"));
+        result,
+        contains(
+          "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
+        ),
+      );
     });
 
     test('does not add duplicate mapping', () {
@@ -318,10 +372,13 @@ void main() {
         'void main() {}',
         'void _addWorkerMappings() {',
         "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
-        '}'
+        '}',
       ];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(result.where((l) => l.contains("'myFunction'")).length, equals(1));
     });
@@ -331,13 +388,18 @@ void main() {
         'void main() {}',
         'void _addWorkerMappings() {',
         "  IsolateManager.addWorkerMapping(myFunction, 'workers/myFunction');",
-        '}'
+        '}',
       ];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', 'workers');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        'workers',
+      );
 
-      expect(result.where((l) => l.contains("'workers/myFunction'")).length,
-          equals(1));
+      expect(
+        result.where((l) => l.contains("'workers/myFunction'")).length,
+        equals(1),
+      );
     });
 
     test('handles function with double quotes', () {
@@ -345,15 +407,20 @@ void main() {
         'void main() {}',
         'void _addWorkerMappings() {',
         '  IsolateManager.addWorkerMapping(existingFunction, "existingFunction");',
-        '}'
+        '}',
       ];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(
-          result,
-          contains(
-              "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');"));
+        result,
+        contains(
+          "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
+        ),
+      );
     });
 
     test('preserves comments in existing function', () {
@@ -362,23 +429,31 @@ void main() {
         'void _addWorkerMappings() {',
         '  // Add worker mappings here',
         "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
-        '}'
+        '}',
       ];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(result, contains('  // Add worker mappings here'));
     });
 
     test('adds correct documentation comments to new function', () {
       final content = ['void main() {}'];
-      final result =
-          addOrUpdateWorkerMappingsFunction(content, 'myFunction', '');
+      final result = addOrUpdateWorkerMappingsFunction(
+        content,
+        'myFunction',
+        '',
+      );
 
       expect(
-          result,
-          contains(
-              '/// This method MUST be stored at the end of the file to avoid'));
+        result,
+        contains(
+          '/// This method MUST be stored at the end of the file to avoid',
+        ),
+      );
       expect(result, contains('/// issues when generating.'));
     });
   });
@@ -403,17 +478,25 @@ void main() {
 
     test('integrates all required changes', () async {
       await addWorkerMappingToSourceFile(
-          tempMainPath, tempSourcePath, 'worker', 'sub_path');
+        tempMainPath,
+        tempSourcePath,
+        'worker',
+        'sub_path',
+      );
 
       final content = await File(tempMainPath).readAsLines();
-      expect(content,
-          contains("import 'package:isolate_manager/isolate_manager.dart';"));
+      expect(
+        content,
+        contains("import 'package:isolate_manager/isolate_manager.dart';"),
+      );
       expect(content, contains("import 'source.dart';"));
       expect(content, contains('  _addWorkerMappings();'));
       expect(
-          content,
-          contains(
-              "  IsolateManager.addWorkerMapping(worker, 'sub_path/worker');"));
+        content,
+        contains(
+          "  IsolateManager.addWorkerMapping(worker, 'sub_path/worker');",
+        ),
+      );
     });
   });
 

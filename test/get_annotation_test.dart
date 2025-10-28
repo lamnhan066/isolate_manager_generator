@@ -6,12 +6,14 @@ import 'package:test/test.dart';
 
 void main() {
   test('Get annotations test', () async {
-    final annotations =
-        await parseAnnotations(path.join('test', 'functions.dart'), [
-      'isolateManagerWorker',
-      'isolateManagerCustomWorker',
-      'isolateManagerSharedWorker',
-    ]);
+    final annotations = await parseAnnotations(
+      path.join('test', 'functions.dart'),
+      [
+        'isolateManagerWorker',
+        'isolateManagerCustomWorker',
+        'isolateManagerSharedWorker',
+      ],
+    );
 
     expect(
       annotations,
@@ -33,7 +35,7 @@ void main() {
           'myMultiWorkersFunction',
           'MyService.mySharedWorkerFunction',
           'MyService.myMultiWorkersFunction',
-        ]
+        ],
       }),
     );
   });
@@ -54,32 +56,38 @@ void main() {
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'myCustomWorkerFunction.js')}'),
+        'Compiled: ${path.join('test', 'output', 'myCustomWorkerFunction.js')}',
+      ),
     );
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'MyService.myCustomWorkerFunction.js')}'),
+        'Compiled: ${path.join('test', 'output', 'MyService.myCustomWorkerFunction.js')}',
+      ),
     );
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'myWorkerFunction.js')}'),
+        'Compiled: ${path.join('test', 'output', 'myWorkerFunction.js')}',
+      ),
     );
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'MyService.myWorkerMethod.js')}'),
+        'Compiled: ${path.join('test', 'output', 'MyService.myWorkerMethod.js')}',
+      ),
     );
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'myMultiWorkersFunction.js')}'),
+        'Compiled: ${path.join('test', 'output', 'myMultiWorkersFunction.js')}',
+      ),
     );
     expect(
       process.stdout,
       contains(
-          'Compiled: ${path.join('test', 'output', 'MyService.myMultiWorkersFunction.js')}'),
+        'Compiled: ${path.join('test', 'output', 'MyService.myMultiWorkersFunction.js')}',
+      ),
     );
 
     for (final fileName in [

@@ -49,25 +49,33 @@ List<String> addImportStatements(
   }
 
   final newFunctionSourceImport = p.relative(sourceFilePath, from: 'lib');
-  final newFunctionSourceImportRelativeFromMain =
-      p.relative(sourceFilePath, from: p.dirname(mainPath));
+  final newFunctionSourceImportRelativeFromMain = p.relative(
+    sourceFilePath,
+    from: p.dirname(mainPath),
+  );
 
   // Convert paths to use forward slashes for import statements
-  final platformIndependentSourceImport =
-      newFunctionSourceImport.replaceAll(p.separator, '/');
+  final platformIndependentSourceImport = newFunctionSourceImport.replaceAll(
+    p.separator,
+    '/',
+  );
   final platformIndependentSourceImportRelative =
       newFunctionSourceImportRelativeFromMain.replaceAll(p.separator, '/');
 
-  final containsSourceImport =
-      result.any((line) => line.contains(platformIndependentSourceImport));
-  final containsSourceImportRelativeFromMain = result
-      .any((line) => line.contains(platformIndependentSourceImportRelative));
+  final containsSourceImport = result.any(
+    (line) => line.contains(platformIndependentSourceImport),
+  );
+  final containsSourceImportRelativeFromMain = result.any(
+    (line) => line.contains(platformIndependentSourceImportRelative),
+  );
 
   if (p.absolute(sourceFilePath) != mainPath &&
       !containsSourceImport &&
       !containsSourceImportRelativeFromMain) {
-    result.insert(++lastImportIndex,
-        "import '$platformIndependentSourceImportRelative';");
+    result.insert(
+      ++lastImportIndex,
+      "import '$platformIndependentSourceImportRelative';",
+    );
   }
 
   return result;
@@ -120,8 +128,9 @@ List<String> addOrUpdateWorkerMappingsFunction(
   final newWorkerMappingLine =
       "  IsolateManager.addWorkerMapping($functionName, '$functionPath');";
 
-  final addWorkerMappingsIndex = result.indexWhere((line) =>
-      line.replaceAll(' ', '').startsWith('void_addWorkerMappings()'));
+  final addWorkerMappingsIndex = result.indexWhere(
+    (line) => line.replaceAll(' ', '').startsWith('void_addWorkerMappings()'),
+  );
 
   if (addWorkerMappingsIndex == -1) {
     // Add new function
@@ -136,7 +145,8 @@ List<String> addOrUpdateWorkerMappingsFunction(
   } else {
     // Update existing function
     final containsFunctionPath = result.any(
-        (line) => line.contains(RegExp('(\'$functionPath\'|"$functionPath")')));
+      (line) => line.contains(RegExp('(\'$functionPath\'|"$functionPath")')),
+    );
 
     if (!containsFunctionPath) {
       final line = result[addWorkerMappingsIndex].replaceAll(' ', '');
@@ -176,8 +186,11 @@ Future<void> addWorkerMappingToSourceFile(
 
   var updatedContent = addImportStatements(content, sourceFilePath, mainPath);
   updatedContent = addWorkerMappingsCall(updatedContent);
-  updatedContent =
-      addOrUpdateWorkerMappingsFunction(updatedContent, functionName, subDir);
+  updatedContent = addOrUpdateWorkerMappingsFunction(
+    updatedContent,
+    functionName,
+    subDir,
+  );
 
   await writeFile(mainPath, updatedContent);
 
@@ -265,8 +278,9 @@ List<String> _containedAnnotations(
     if (constantValue != null) {
       // We check only the variable name to avoid issues with different import paths.
       // Not use this type check: `e == constantValue.type?.element?.name`
-      final foundAnnotation =
-          classAnnotations.where((e) => e == constantValue.variable?.name);
+      final foundAnnotation = classAnnotations.where(
+        (e) => e == constantValue.variable?.name,
+      );
 
       foundAnnotations.addAll(foundAnnotation);
     }

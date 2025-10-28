@@ -69,11 +69,13 @@ class IsolateManagerGenerator {
         valueHelp: 'web',
         defaultsTo: 'web',
       )
-      ..addOption('shared-name',
-          valueHelp: kSharedWorkerName,
-          defaultsTo: kSharedWorkerName,
-          help: 'Name of the generated shared Worker',
-          aliases: ['name'])
+      ..addOption(
+        'shared-name',
+        valueHelp: kSharedWorkerName,
+        defaultsTo: kSharedWorkerName,
+        help: 'Name of the generated shared Worker',
+        aliases: ['name'],
+      )
       ..addOption(
         'obfuscate',
         valueHelp: '4',
