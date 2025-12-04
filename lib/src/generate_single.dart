@@ -235,7 +235,14 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
       );
       if (!isDebug) {
         if (isWasm) {
-          await File(p.join(output, '$name.unopt.wasm')).delete();
+          for (final unoptFile in [
+            File(p.join(output, '$name.unopt.wasm')),
+            File(p.join(output, '$name.unopt.wasm.map')),
+          ]) {
+            if (unoptFile.existsSync()) {
+              await unoptFile.delete();
+            }
+          }
         } else {
           await File(p.join(output, '$name.js.deps')).delete();
         }
