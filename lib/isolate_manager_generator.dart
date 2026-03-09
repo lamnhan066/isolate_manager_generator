@@ -85,7 +85,8 @@ class IsolateManagerGenerator {
       ..addFlag(
         'debug',
         help:
-            'Export the debug files like *.js.deps, *.js.map and *.unopt.wasm',
+            'Export the debug files like *.js.deps, *.js.map '
+            'and *.unopt.wasm',
       )
       ..addFlag(
         'wasm',
@@ -95,13 +96,16 @@ class IsolateManagerGenerator {
         'worker-mappings-experiment',
         defaultsTo: '',
         help:
-            '[Experiment] Generate the `workerMappings` and add it to the `main` app automatically',
+            '[Experiment] Generate the `workerMappings` and add it to '
+            'the `main` app automatically',
       )
       ..addFlag('help', abbr: 'h', help: 'Display this help message.')
       ..addOption(
         'sub-path',
         help:
-            "Sub-path of the function name when generate the worker-mappings (apply only for the single functions). It's different from the `output` path.",
+            'Sub-path of the function name when generating the '
+            'worker-mappings (applies only to single functions). '
+            "It's different from the `output` path.",
         defaultsTo: '',
         aliases: ['sub-dir'],
       );

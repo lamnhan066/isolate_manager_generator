@@ -122,11 +122,12 @@ List<String> addOrUpdateWorkerMappingsFunction(
   String subPath,
 ) {
   final result = List<String>.from(content);
-  // We don't need to set the right separator here, the `IsolateManager.addWorkerMapping`
-  // method will handle it.
+  // We don't need to set the right separator here. The
+  // `IsolateManager.addWorkerMapping` method will handle it.
   final functionPath = subPath == '' ? functionName : '$subPath/$functionName';
   final newWorkerMappingLine =
-      "  IsolateManager.addWorkerMapping($functionName, '$functionPath');";
+      '  IsolateManager.addWorkerMapping($functionName, '
+      "'$functionPath');";
 
   final addWorkerMappingsIndex = result.indexWhere(
     (line) => line.replaceAll(' ', '').startsWith('void_addWorkerMappings()'),
@@ -144,9 +145,8 @@ List<String> addOrUpdateWorkerMappingsFunction(
       ..add('');
   } else {
     // Update existing function
-    final containsFunctionPath = result.any(
-      (line) => line.contains(RegExp('(\'$functionPath\'|"$functionPath")')),
-    );
+    final pattern = RegExp('(\'$functionPath\'|"$functionPath")');
+    final containsFunctionPath = result.any((line) => line.contains(pattern));
 
     if (!containsFunctionPath) {
       final line = result[addWorkerMappingsIndex].replaceAll(' ', '');
@@ -196,7 +196,8 @@ Future<void> addWorkerMappingToSourceFile(
 
   printDebug(
     () =>
-        'Updated source file: $sourceFilePath with new import, worker mapping call, and addWorkerMappings function.',
+        'Updated source file: $sourceFilePath with new import, '
+        'worker mapping call, and addWorkerMappings function.',
   );
 }
 
@@ -276,8 +277,9 @@ List<String> _containedAnnotations(
   for (final annotation in metadata) {
     final constantValue = annotation.computeConstantValue();
     if (constantValue != null) {
-      // We check only the variable name to avoid issues with different import paths.
-      // Not use this type check: `e == constantValue.type?.element?.name`
+      // We check only the variable name to avoid issues with different import
+      // paths.
+      // Do not use the type check `e == constantValue.type?.element?.name`.
       final foundAnnotation = classAnnotations.where(
         (e) => e == constantValue.variable?.name,
       );

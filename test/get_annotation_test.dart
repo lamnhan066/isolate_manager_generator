@@ -56,50 +56,26 @@ void main() {
         ],
       );
 
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'myCustomWorkerFunction.js')}',
-        ),
+      final compiled1 = path.join(outputDir, 'myCustomWorkerFunction.js');
+      expect(process.stdout, contains('Compiled: $compiled1'));
+      final compiled2 = path.join(
+        outputDir,
+        'MyService.myCustomWorkerFunction.js',
       );
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'MyService.myCustomWorkerFunction.js')}',
-        ),
+      expect(process.stdout, contains('Compiled: $compiled2'));
+      final compiled3 = path.join(outputDir, 'myWorkerFunction.js');
+      expect(process.stdout, contains('Compiled: $compiled3'));
+      final compiled4 = path.join(outputDir, 'MyService.myWorkerMethod.js');
+      expect(process.stdout, contains('Compiled: $compiled4'));
+      final compiled5 = path.join(outputDir, 'myMultiWorkersFunction.js');
+      expect(process.stdout, contains('Compiled: $compiled5'));
+      final compiled6 = path.join(
+        outputDir,
+        'MyService.myMultiWorkersFunction.js',
       );
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'myWorkerFunction.js')}',
-        ),
-      );
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'MyService.myWorkerMethod.js')}',
-        ),
-      );
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'myMultiWorkersFunction.js')}',
-        ),
-      );
-      expect(
-        process.stdout,
-        contains(
-          'Compiled: ${path.join(outputDir, 'MyService.myMultiWorkersFunction.js')}',
-        ),
-      );
-      expect(
-        process.stdout,
-        isNot(
-          contains(
-            'Compiled: ${path.join(outputDir, 'notAWorkerFunction.js')}',
-          ),
-        ),
-      );
+      expect(process.stdout, contains('Compiled: $compiled6'));
+      final notCompiled = path.join(outputDir, 'notAWorkerFunction.js');
+      expect(process.stdout, isNot(contains('Compiled: $notCompiled')));
 
       for (final fileName in [
         'myCustomWorkerFunction.js',

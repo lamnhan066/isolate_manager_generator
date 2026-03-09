@@ -65,12 +65,16 @@ void main() {
           );
           expect(
             process.stdout,
-            isNot(contains('PathNotFoundException')),
+            isNot(
+              contains('PathNotFoundException'),
+            ),
             reason: 'Should not have path not found errors',
           );
           expect(
             process.stdout,
-            isNot(contains('FileSystemException')),
+            isNot(
+              contains('FileSystemException'),
+            ),
             reason: 'Should not have file system exceptions',
           );
         },
@@ -81,8 +85,8 @@ void main() {
         () async {
           // Test that generation completes successfully even when
           // .unopt.wasm file doesn't exist (defensive check)
-          // Note: wasm compilation may fail in some environments, so we just check
-          // that it doesn't fail due to file deletion errors
+          // Note: wasm compilation may fail in some environments.
+          // We only check that it does not fail due to file deletion errors.
           final process = await Process.run(
             Platform.resolvedExecutable,
             [
@@ -99,15 +103,20 @@ void main() {
             ],
           );
 
-          // Should not fail due to file deletion errors (even if compilation fails)
+          // Should not fail due to file deletion errors
+          // (even if compilation fails)
           expect(
             process.stdout,
-            isNot(contains('PathNotFoundException')),
+            isNot(
+              contains('PathNotFoundException'),
+            ),
             reason: 'Should not have path not found errors for wasm files',
           );
           expect(
             process.stdout,
-            isNot(contains('FileSystemException')),
+            isNot(
+              contains('FileSystemException'),
+            ),
             reason: 'Should not have file system exceptions for wasm files',
           );
         },
@@ -141,12 +150,16 @@ void main() {
           );
           expect(
             process.stdout,
-            isNot(contains('PathNotFoundException')),
+            isNot(
+              contains('PathNotFoundException'),
+            ),
             reason: 'Should not have path not found errors',
           );
           expect(
             process.stdout,
-            isNot(contains('FileSystemException')),
+            isNot(
+              contains('FileSystemException'),
+            ),
             reason: 'Should not have file system exceptions',
           );
         },
@@ -157,8 +170,8 @@ void main() {
         () async {
           // Test that generation completes successfully even when
           // .unopt.wasm file doesn't exist (defensive check)
-          // Note: wasm compilation may fail in some environments, so we just check
-          // that it doesn't fail due to file deletion errors
+          // Note: wasm compilation may fail in some environments.
+          // We only check that it does not fail due to file deletion errors.
           final process = await Process.run(
             Platform.resolvedExecutable,
             [
@@ -175,15 +188,20 @@ void main() {
             ],
           );
 
-          // Should not fail due to file deletion errors (even if compilation fails)
+          // Should not fail due to file deletion errors
+          // (even if compilation fails)
           expect(
             process.stdout,
-            isNot(contains('PathNotFoundException')),
+            isNot(
+              contains('PathNotFoundException'),
+            ),
             reason: 'Should not have path not found errors for wasm files',
           );
           expect(
             process.stdout,
-            isNot(contains('FileSystemException')),
+            isNot(
+              contains('FileSystemException'),
+            ),
             reason: 'Should not have file system exceptions for wasm files',
           );
         },
@@ -220,17 +238,21 @@ void main() {
             ],
           );
 
-          // Should complete successfully (file should be deleted and regenerated)
+          // Should complete successfully
+          // (file should be deleted and regenerated)
           expect(
             process.exitCode,
             equals(0),
             reason: 'Generation should complete successfully',
           );
+          final compiledPath = path.join(
+            'test',
+            'output',
+            'myWorkerFunction.js',
+          );
           expect(
             process.stdout,
-            contains(
-              'Compiled: ${path.join('test', 'output', 'myWorkerFunction.js')}',
-            ),
+            contains('Compiled: $compiledPath'),
             reason: 'Should contain compilation success message',
           );
 
@@ -276,17 +298,21 @@ void main() {
             ],
           );
 
-          // Should complete successfully (file should be deleted and regenerated)
+          // Should complete successfully
+          // (file should be deleted and regenerated)
           expect(
             process.exitCode,
             equals(0),
             reason: 'Shared generation should complete successfully',
           );
+          final compiledPath = path.join(
+            'test',
+            'output',
+            r'$shared_worker.js',
+          );
           expect(
             process.stdout,
-            contains(
-              'Compiled: ${path.join('test', 'output', r'$shared_worker.js')}',
-            ),
+            contains('Compiled: $compiledPath'),
             reason: 'Should contain compilation success message',
           );
 
@@ -332,11 +358,14 @@ void main() {
 
           // Should complete successfully
           expect(process.exitCode, equals(0));
+          final compiledPath = path.join(
+            'test',
+            'output',
+            'myWorkerFunction.wasm',
+          );
           expect(
             process.stdout,
-            contains(
-              'Compiled: ${path.join('test', 'output', 'myWorkerFunction.wasm')}',
-            ),
+            contains('Compiled: $compiledPath'),
           );
         },
       );
@@ -372,11 +401,14 @@ void main() {
 
           // Should complete successfully
           expect(process.exitCode, equals(0));
+          final compiledPath = path.join(
+            'test',
+            'output',
+            r'$shared_worker.wasm',
+          );
           expect(
             process.stdout,
-            contains(
-              'Compiled: ${path.join('test', 'output', r'$shared_worker.wasm')}',
-            ),
+            contains('Compiled: $compiledPath'),
           );
         },
       );
@@ -663,7 +695,7 @@ void main() {
 }
 
 /// Cleans up temporary worker files generated during tests.
-/// These files are created by the isolate_manager_generator and should be deleted.
+/// These files are created by the generator and should be deleted.
 void _cleanupTempWorkerFiles(String directory) {
   if (!Directory(directory).existsSync()) {
     return;
@@ -689,7 +721,7 @@ void _cleanupTempWorkerFiles(String directory) {
 }
 
 /// Cleans up temporary shared worker files generated during tests.
-/// These files are created by the isolate_manager_generator and should be deleted.
+/// These files are created by the generator and should be deleted.
 void _cleanupTempSharedWorkerFiles(String directory) {
   if (!Directory(directory).existsSync()) {
     return;

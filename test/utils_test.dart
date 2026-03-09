@@ -316,12 +316,10 @@ void main() {
       );
 
       expect(result, contains('void _addWorkerMappings() {'));
-      expect(
-        result,
-        contains(
-          "  IsolateManager.addWorkerMapping(myFunction, 'subDir/myFunction');",
-        ),
-      );
+      const expected1 =
+          '  IsolateManager.addWorkerMapping(myFunction, '
+          "'subDir/myFunction');";
+      expect(result, contains(expected1));
     });
 
     test('updates existing empty worker mappings function', () {
@@ -332,19 +330,18 @@ void main() {
         '',
       );
 
-      expect(
-        result.join('\n'),
-        contains(
-          "void _addWorkerMappings() {\n  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
-        ),
-      );
+      const expected2a = 'void _addWorkerMappings() {';
+      const expected2b =
+          '  IsolateManager.addWorkerMapping(myFunction, '
+          "'myFunction');";
+      expect(result.join('\n'), contains('$expected2a\n$expected2b'));
     });
 
     test('adds to existing worker mappings function', () {
       final content = [
         'void main() {}',
         'void _addWorkerMappings() {',
-        "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
+        "  IsolateManager.addWorkerMapping(existingFunc, 'existingFunc');",
         '}',
       ];
       final result = addOrUpdateWorkerMappingsFunction(
@@ -353,18 +350,13 @@ void main() {
         '',
       );
 
-      expect(
-        result,
-        contains(
-          "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
-        ),
-      );
-      expect(
-        result,
-        contains(
-          "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
-        ),
-      );
+      const expected3a = '  IsolateManager.addWorkerMapping(myFunction, ';
+      const expected3b = "'myFunction');";
+      expect(result, contains('$expected3a$expected3b'));
+      const expectedExistingA =
+          '  IsolateManager.addWorkerMapping(existingFunc, ';
+      const expectedExistingB = "'existingFunc');";
+      expect(result, contains('$expectedExistingA$expectedExistingB'));
     });
 
     test('does not add duplicate mapping', () {
@@ -380,7 +372,8 @@ void main() {
         '',
       );
 
-      expect(result.where((l) => l.contains("'myFunction'")).length, equals(1));
+      const expected4 = "'myFunction'";
+      expect(result.where((l) => l.contains(expected4)).length, equals(1));
     });
 
     test('does not add duplicate mapping with available subDir', () {
@@ -396,17 +389,15 @@ void main() {
         'workers',
       );
 
-      expect(
-        result.where((l) => l.contains("'workers/myFunction'")).length,
-        equals(1),
-      );
+      const expected5 = "'workers/myFunction'";
+      expect(result.where((l) => l.contains(expected5)).length, equals(1));
     });
 
     test('handles function with double quotes', () {
       final content = [
         'void main() {}',
         'void _addWorkerMappings() {',
-        '  IsolateManager.addWorkerMapping(existingFunction, "existingFunction");',
+        '  IsolateManager.addWorkerMapping(existingFunc, "existingFunc");',
         '}',
       ];
       final result = addOrUpdateWorkerMappingsFunction(
@@ -415,12 +406,9 @@ void main() {
         '',
       );
 
-      expect(
-        result,
-        contains(
-          "  IsolateManager.addWorkerMapping(myFunction, 'myFunction');",
-        ),
-      );
+      const expected6a = '  IsolateManager.addWorkerMapping(myFunction, ';
+      const expected6b = "'myFunction');";
+      expect(result, contains('$expected6a$expected6b'));
     });
 
     test('preserves comments in existing function', () {
@@ -428,7 +416,7 @@ void main() {
         'void main() {}',
         'void _addWorkerMappings() {',
         '  // Add worker mappings here',
-        "  IsolateManager.addWorkerMapping(existingFunction, 'existingFunction');",
+        "  IsolateManager.addWorkerMapping(existingFunc, 'existingFunc');",
         '}',
       ];
       final result = addOrUpdateWorkerMappingsFunction(
@@ -491,12 +479,9 @@ void main() {
       );
       expect(content, contains("import 'source.dart';"));
       expect(content, contains('  _addWorkerMappings();'));
-      expect(
-        content,
-        contains(
-          "  IsolateManager.addWorkerMapping(worker, 'sub_path/worker');",
-        ),
-      );
+      const expectedIntegration =
+          "  IsolateManager.addWorkerMapping(worker, 'sub_path/worker');";
+      expect(content, contains(expectedIntegration));
     });
   });
 
