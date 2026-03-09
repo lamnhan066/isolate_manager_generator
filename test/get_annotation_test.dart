@@ -41,66 +41,72 @@ void main() {
   });
 
   test('Generate js', () async {
-    final process = await Process.run(
-      Platform.resolvedExecutable,
-      [
-        'run',
-        'isolate_manager_generator',
-        '--input',
-        'test',
-        '--output',
-        path.join('test', 'output'),
-      ],
-    );
+    final outputDir = path.join('test', 'img_test_output');
 
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'myCustomWorkerFunction.js')}',
-      ),
-    );
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'MyService.myCustomWorkerFunction.js')}',
-      ),
-    );
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'myWorkerFunction.js')}',
-      ),
-    );
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'MyService.myWorkerMethod.js')}',
-      ),
-    );
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'myMultiWorkersFunction.js')}',
-      ),
-    );
-    expect(
-      process.stdout,
-      contains(
-        'Compiled: ${path.join('test', 'output', 'MyService.myMultiWorkersFunction.js')}',
-      ),
-    );
+    try {
+      final process = await Process.run(
+        Platform.resolvedExecutable,
+        [
+          'run',
+          'isolate_manager_generator',
+          '--input',
+          'test',
+          '--output',
+          outputDir,
+        ],
+      );
 
-    for (final fileName in [
-      'myCustomWorkerFunction.js',
-      'MyService.myCustomWorkerFunction.js',
-      'myWorkerFunction.js',
-      'MyService.myWorkerMethod.js',
-      'myMultiWorkersFunction.js',
-      'MyService.myMultiWorkersFunction.js',
-    ]) {
-      expect(File(path.join('test', 'output', fileName)).existsSync(), isTrue);
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'myCustomWorkerFunction.js')}',
+        ),
+      );
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'MyService.myCustomWorkerFunction.js')}',
+        ),
+      );
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'myWorkerFunction.js')}',
+        ),
+      );
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'MyService.myWorkerMethod.js')}',
+        ),
+      );
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'myMultiWorkersFunction.js')}',
+        ),
+      );
+      expect(
+        process.stdout,
+        contains(
+          'Compiled: ${path.join(outputDir, 'MyService.myMultiWorkersFunction.js')}',
+        ),
+      );
+
+      for (final fileName in [
+        'myCustomWorkerFunction.js',
+        'MyService.myCustomWorkerFunction.js',
+        'myWorkerFunction.js',
+        'MyService.myWorkerMethod.js',
+        'myMultiWorkersFunction.js',
+        'MyService.myMultiWorkersFunction.js',
+      ]) {
+        expect(File(path.join(outputDir, fileName)).existsSync(), isTrue);
+      }
+    } finally {
+      if (Directory(outputDir).existsSync()) {
+        Directory(outputDir).deleteSync(recursive: true);
+      }
     }
-
-    Directory(path.join('test', 'output')).deleteSync(recursive: true);
   });
 }
