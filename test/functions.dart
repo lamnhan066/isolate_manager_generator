@@ -53,6 +53,6 @@ class MyService {
   }
 }
 
-void anotherFunction() {
+void notAWorkerFunction() {
   print('Not a worker.');
 }

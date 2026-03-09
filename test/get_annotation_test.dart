@@ -92,6 +92,14 @@ void main() {
           'Compiled: ${path.join(outputDir, 'MyService.myMultiWorkersFunction.js')}',
         ),
       );
+      expect(
+        process.stdout,
+        isNot(
+          contains(
+            'Compiled: ${path.join(outputDir, 'notAWorkerFunction.js')}',
+          ),
+        ),
+      );
 
       for (final fileName in [
         'myCustomWorkerFunction.js',
