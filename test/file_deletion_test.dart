@@ -465,25 +465,32 @@ void main() {
         'handles empty input directory gracefully',
         () async {
           final emptyDir = path.join('test', 'empty_input');
-          Directory(emptyDir).createSync(recursive: true);
+          try {
+            Directory(emptyDir).createSync(recursive: true);
 
-          final process = await Process.run(
-            Platform.resolvedExecutable,
-            [
-              'run',
-              'isolate_manager_generator',
-              '--single',
-              '--input',
-              emptyDir,
-              '--output',
-              outputDir,
-              '--obfuscate',
-              '0',
-            ],
-          );
+            final process = await Process.run(
+              Platform.resolvedExecutable,
+              [
+                'run',
+                'isolate_manager_generator',
+                '--single',
+                '--input',
+                emptyDir,
+                '--output',
+                outputDir,
+                '--obfuscate',
+                '0',
+              ],
+            );
 
-          // Should complete without errors even with no annotated functions
-          expect(process.exitCode, equals(0));
+            // Should complete without errors even with no annotated functions
+            expect(process.exitCode, equals(0));
+          } finally {
+            // Clean up the empty input directory
+            if (Directory(emptyDir).existsSync()) {
+              Directory(emptyDir).deleteSync(recursive: true);
+            }
+          }
         },
       );
 
