@@ -1,3 +1,9 @@
+## 0.3.1
+
+* Improve the deletion logic to check for file existence before deletion.
+* Refactor the code to completely satisfy with `very_good_analysis: ^10.0.0`.
+* Improve the tests.
+
 ## 0.3.0
 
 * Update to support Dart SDK `^3.9.0`.
