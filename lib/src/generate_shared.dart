@@ -183,7 +183,6 @@ Future<void> _generateFromAnnotatedFunctions(
         '-o',
         p.normalize(outputPath),
         obfuscate,
-        if (!isWasm) '--omit-implicit-checks',
         ...dartArgs,
       ],
     );

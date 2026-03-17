@@ -213,7 +213,6 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
         '-o',
         outputPath,
         obfuscate,
-        if (!isWasm) '--omit-implicit-checks',
         ...dartArgs,
       ],
     );
