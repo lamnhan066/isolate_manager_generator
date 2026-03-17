@@ -1,3 +1,34 @@
+## 0.4.0
+
+* BREAKING CHANGE: Removed `--omit-implicit-checks` option.
+    Before (the option is added automatically):
+
+    ```dart
+    dart run isolate_manager_generator
+    ```
+
+    After (the option is added manually):
+
+    ```dart
+    dart run isolate_manager_generator -- --omit-implicit-checks
+    ```
+
+* BREAKING CHANGE: Removed unused source map generation and cleanup logic.
+    Before (the option is added automatically):
+
+    ```dart
+    dart run isolate_manager_generator
+    ```
+
+    After (the option is added manually):
+
+    ```dart
+    dart run isolate_manager_generator -- --no-source-maps
+    ```
+
+* BREAKING CHANGE: The `js.deps` files are no longer removed automatically, and there is no helper available for this change.
+* Bump the dart analyzer to `^10.0.0`.
+
 ## 0.3.1
 
 * Improve the deletion logic to check for file existence before deletion.
