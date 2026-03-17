@@ -1,3 +1,8 @@
+## 0.4.1
+
+* Refactor file writing in annotated function generation to use a list for content accumulation.
+* Ensure the Dart temp files are existed before running the JS generator.
+
 ## 0.4.0
 
 * BREAKING CHANGE: Removed `--omit-implicit-checks` option.
