@@ -85,8 +85,8 @@ class IsolateManagerGenerator {
       ..addFlag(
         'debug',
         help:
-            'Export the debug files like *.js.deps, *.js.map '
-            'and *.unopt.wasm',
+            'Export the debug files (including the generated Worker files '
+            'and the intermediate files)',
       )
       ..addFlag(
         'wasm',
