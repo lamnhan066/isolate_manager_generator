@@ -184,7 +184,6 @@ Future<void> _generateFromAnnotatedFunctions(
         p.normalize(outputPath),
         obfuscate,
         if (!isWasm) '--omit-implicit-checks',
-        if (!isDebug && !isWasm) '--no-source-maps',
         ...dartArgs,
       ],
     );
@@ -199,19 +198,6 @@ Future<void> _generateFromAnnotatedFunctions(
 
     if (outputFile.existsSync()) {
       printDebug(() => 'Compiled: ${p.relative(outputPath)}');
-      if (!isDebug) {
-        if (isWasm) {
-          final unoptWasmFile = File(p.join(output, '$name.unopt.wasm'));
-          if (unoptWasmFile.existsSync()) {
-            await unoptWasmFile.delete();
-          }
-        } else {
-          final jsDepsFile = File(p.join(output, '$name.js.deps'));
-          if (jsDepsFile.existsSync()) {
-            await jsDepsFile.delete();
-          }
-        }
-      }
     } else {
       printDebug(() => 'Compile ERROR: ${p.relative(outputPath)}');
       final r = result.stdout.toString().split('\n');

@@ -214,7 +214,6 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
         outputPath,
         obfuscate,
         if (!isWasm) '--omit-implicit-checks',
-        if (!isDebug && !isWasm) '--no-source-maps',
         ...dartArgs,
       ],
     );
@@ -233,19 +232,6 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
             'Path: ${p.relative(sourceFilePath)} => '
             'Function: ${function.key} => Compiled: ${p.relative(outputPath)}',
       );
-      if (!isDebug) {
-        if (isWasm) {
-          final unoptWasmPath = p.join(output, '$name.unopt.wasm');
-          if (File(unoptWasmPath).existsSync()) {
-            await File(unoptWasmPath).delete();
-          }
-        } else {
-          final jsDepsPath = p.join(output, '$name.js.deps');
-          if (File(jsDepsPath).existsSync()) {
-            await File(jsDepsPath).delete();
-          }
-        }
-      }
     } else {
       printDebug(
         () =>
