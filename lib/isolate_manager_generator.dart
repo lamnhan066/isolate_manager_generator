@@ -46,6 +46,75 @@ class IsolateManagerGenerator {
   static Future<void> _execute(List<String> args) async {
     final parsedArgs = parseArgs(args);
 
+    // Read pubspec `isolate_manager` node and merge into main args when not
+    // explicitly provided on CLI. CLI has precedence over pubspec values.
+    final pubspecConfig = readPubspecConfig();
+    final mainArgs = List<String>.from(parsedArgs.mainArgs);
+
+    bool provided(List<String> list, String long, String? short) {
+      return list.any((a) => a == '-$short' || a.startsWith('--$long'));
+    }
+
+    if (pubspecConfig != null) {
+      // Flags: single, shared, wasm, debug
+      if (pubspecConfig.containsKey('single') &&
+          !provided(mainArgs, 'single', 's')) {
+        if (pubspecConfig['single'] == true) {
+          mainArgs.add('--single');
+        } else {
+          mainArgs.add('--no-single');
+        }
+      }
+      if (pubspecConfig.containsKey('shared') &&
+          !provided(mainArgs, 'shared', null)) {
+        if (pubspecConfig['shared'] == true) {
+          mainArgs.add('--shared');
+        } else {
+          mainArgs.add('--no-shared');
+        }
+      }
+      if (pubspecConfig.containsKey('wasm') &&
+          !provided(mainArgs, 'wasm', null) &&
+          pubspecConfig['wasm'] == true) {
+        mainArgs.add('--wasm');
+      }
+      if (pubspecConfig.containsKey('debug') &&
+          !provided(mainArgs, 'debug', null) &&
+          pubspecConfig['debug'] == true) {
+        mainArgs.add('--debug');
+      }
+
+      // Options: input, output, shared-name, obfuscate,
+      // sub-path, worker-mappings-experiment
+      if (pubspecConfig.containsKey('input') &&
+          !provided(mainArgs, 'input', 'i')) {
+        mainArgs.add('--input=${pubspecConfig['input']}');
+      }
+      if (pubspecConfig.containsKey('output') &&
+          !provided(mainArgs, 'output', 'o')) {
+        mainArgs.add('--output=${pubspecConfig['output']}');
+      }
+      if (pubspecConfig.containsKey('shared-name') &&
+          !provided(mainArgs, 'shared-name', null)) {
+        mainArgs.add('--shared-name=${pubspecConfig['shared-name']}');
+      }
+      if (pubspecConfig.containsKey('obfuscate') &&
+          !provided(mainArgs, 'obfuscate', null)) {
+        mainArgs.add('--obfuscate=${pubspecConfig['obfuscate']}');
+      }
+      if (pubspecConfig.containsKey('sub-path') &&
+          !provided(mainArgs, 'sub-path', null)) {
+        mainArgs.add('--sub-path=${pubspecConfig['sub-path']}');
+      }
+      if (pubspecConfig.containsKey('worker-mappings-experiment') &&
+          !provided(mainArgs, 'worker-mappings-experiment', null)) {
+        mainArgs.add(
+          '--worker-mappings-experiment='
+          '${pubspecConfig['worker-mappings-experiment']}',
+        );
+      }
+    }
+
     final parser = ArgParser()
       ..addFlag(
         'single',
@@ -110,7 +179,7 @@ class IsolateManagerGenerator {
         aliases: ['sub-dir'],
       );
 
-    final argResults = parser.parse(parsedArgs.mainArgs);
+    final argResults = parser.parse(mainArgs);
 
     if (argResults['help'] as bool) {
       printDebug(() => parser.usage);

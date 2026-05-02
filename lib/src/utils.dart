@@ -5,12 +5,50 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
 import 'package:path/path.dart' as p;
+import 'package:yaml/yaml.dart';
 
 /// Prints debug information if in debug mode
 void printDebug(Object? Function() log) {
   // Print the log message
   // ignore: avoid_print
   print(log());
+}
+
+/// Reads `pubspec.yaml` from current working directory and returns the
+/// `isolate_manager` configuration node as a plain `Map<String, dynamic>`.
+Map<String, dynamic>? readPubspecConfig() {
+  final file = File('pubspec.yaml');
+  if (!file.existsSync()) return null;
+
+  final content = file.readAsStringSync();
+  final yaml = loadYaml(content);
+  if (yaml == null || yaml is! YamlMap) return null;
+
+  // Support multiple key styles:
+  // isolate_manager, "isolate-manager", isolateManager
+  final candidates = ['isolate_manager', 'isolate-manager', 'isolateManager'];
+  for (final key in candidates) {
+    if (yaml.containsKey(key)) {
+      final node = yaml[key];
+      return _yamlToNative(node) as Map<String, dynamic>?;
+    }
+  }
+  return null;
+}
+
+dynamic _yamlToNative(dynamic node) {
+  if (node is YamlMap) {
+    final map = <String, dynamic>{};
+    for (final entry in node.entries) {
+      final k = entry.key.toString();
+      map[k] = _yamlToNative(entry.value);
+    }
+    return map;
+  }
+  if (node is YamlList) {
+    return node.map(_yamlToNative).toList();
+  }
+  return node;
 }
 
 /// Reads the content of a file and returns it as a list of lines
