@@ -40,6 +40,10 @@
 
         # Path to the main/source file to inject workerMappings (optional)
         worker-mappings-experiment: lib/main.dart
+
+        # Extra Dart args passed to dart compile before CLI dart args
+        dart-args:
+            - --no-source-maps
     ```
 
     When you run the generator with no flags:
@@ -53,7 +57,8 @@
     setting from `pubspec.yaml`.
 
     Supported keys: `input`, `output`, `single`, `shared`, `shared-name`,
-    `obfuscate`, `wasm`, `debug`, `sub-path`, `worker-mappings-experiment`.
+    `obfuscate`, `wasm`, `debug`, `sub-path`, `worker-mappings-experiment`,
+    `dart-args`.
 
 
 ## 0.4.1

@@ -25,6 +25,8 @@ isolate_manager:
   output: out
   single: true
   shared: false
+  dart-args:
+    - --no-source-maps
 ''';
         await File(p.join(tmp.path, 'pubspec.yaml')).writeAsString(pubspec);
 

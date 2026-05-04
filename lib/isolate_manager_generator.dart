@@ -10,6 +10,25 @@ import 'package:path/path.dart';
 
 /// A utility class for generating isolate manager workers.
 class IsolateManagerGenerator {
+  /// Resolves effective dart args from CLI and pubspec config.
+  ///
+  /// Pubspec `dart-args` are prepended so CLI dart args keep higher priority.
+  static List<String> resolveDartArgs(
+    Map<String, dynamic>? pubspecConfig,
+    List<String> cliDartArgs,
+  ) {
+    final dartArgs = <String>[];
+    if (pubspecConfig != null && pubspecConfig.containsKey('dart-args')) {
+      final pubspecDartArgs = pubspecConfig['dart-args'];
+      if (pubspecDartArgs is List) {
+        dartArgs.addAll(List<String>.from(pubspecDartArgs));
+      }
+    }
+
+    dartArgs.addAll(cliDartArgs);
+    return dartArgs;
+  }
+
   /// Executes the isolate manager generator with the provided arguments.
   ///
   /// Takes a list of command-line arguments, processes them, and generates
@@ -115,6 +134,8 @@ class IsolateManagerGenerator {
       }
     }
 
+    final dartArgs = resolveDartArgs(pubspecConfig, parsedArgs.dartArgs);
+
     final parser = ArgParser()
       ..addFlag(
         'single',
@@ -205,13 +226,13 @@ class IsolateManagerGenerator {
 
     if (isSingle) {
       printDebug(() => '>> Generating the single Workers...');
-      await single.generate(argResults, parsedArgs.dartArgs, dartFiles);
+      await single.generate(argResults, dartArgs, dartFiles);
       printDebug(() => '>> Generated.');
     }
 
     if (isShared) {
       printDebug(() => '>> Generating the shared Worker...');
-      await shared.generate(argResults, parsedArgs.dartArgs, dartFiles);
+      await shared.generate(argResults, dartArgs, dartFiles);
       printDebug(() => '>> Generated.');
     }
   }
