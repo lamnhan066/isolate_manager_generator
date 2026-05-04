@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:isolate_manager_generator/isolate_manager_generator.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -9,7 +8,7 @@ void main() {
     'Uses pubspec isolate_manager node for defaults',
     () async {
       final tmp = await Directory.systemTemp.createTemp('img_pubspec_test');
-      final originalCwd = Directory.current;
+      final repoRoot = Directory.current.path;
       try {
         // Write pubspec.yaml with isolate_manager node
         const pubspec = '''
@@ -63,17 +62,22 @@ void notAWorkerFunction() {
           p.join(libDir.path, 'functions.dart'),
         ).writeAsString(functionsContent);
 
-        // Switch to temp directory so the generator reads this pubspec
-        Directory.current = tmp.path;
+        final process = await Process.run(
+          Platform.resolvedExecutable,
+          ['run', p.join(repoRoot, 'bin', 'isolate_manager_generator.dart')],
+          workingDirectory: tmp.path,
+        );
 
-        final exitCode = await IsolateManagerGenerator.execute([]);
-        expect(exitCode, 0);
+        expect(
+          process.exitCode,
+          0,
+          reason: 'stdout:\n${process.stdout}\nstderr:\n${process.stderr}',
+        );
 
         final outDir = Directory(p.join(tmp.path, 'out'));
         final generated = File(p.join(outDir.path, 'myWorkerFunction.js'));
         expect(generated.existsSync(), isTrue);
       } finally {
-        Directory.current = originalCwd;
         if (tmp.existsSync()) {
           tmp.deleteSync(recursive: true);
         }
