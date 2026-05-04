@@ -14,26 +14,22 @@ void main() {
       Directory(outputDir).createSync(recursive: true);
     });
 
-    tearDown(() {
+    tearDown(() async {
       // Clean up output directory after each test
-      if (Directory(outputDir).existsSync()) {
-        Directory(outputDir).deleteSync(recursive: true);
-      }
+      await _deleteDirectoryWithRetry(outputDir);
 
       // Clean up temporary worker files in test directory
-      _cleanupTempWorkerFiles(testInputDir);
+      await _cleanupTempWorkerFiles(testInputDir);
 
       // Clean up temporary shared worker files in root directory
-      _cleanupTempSharedWorkerFiles(rootDir);
+      await _cleanupTempSharedWorkerFiles(rootDir);
 
       // Clean up non_existent_output directory if it exists
       final nonExistentOutput = path.join(
         'test',
         'non_existent_output',
       );
-      if (Directory(nonExistentOutput).existsSync()) {
-        Directory(nonExistentOutput).deleteSync(recursive: true);
-      }
+      await _deleteDirectoryWithRetry(nonExistentOutput);
     });
 
     group('Existing output file deletion', () {
@@ -444,53 +440,53 @@ void main() {
   });
 }
 
-/// Cleans up temporary worker files generated during tests.
-/// These files are created by the generator and should be deleted.
-void _cleanupTempWorkerFiles(String directory) {
-  if (!Directory(directory).existsSync()) {
+Future<void> _deleteDirectoryWithRetry(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
     return;
   }
 
-  final files = Directory(directory).listSync();
-  for (final file in files) {
-    if (file is File) {
-      final fileName = path.basename(file.path);
-      // Match pattern: .IsolateManagerWorker.*.dart
-      if (fileName.startsWith('.IsolateManagerWorker.') &&
-          fileName.endsWith('.dart')) {
-        try {
-          file.deleteSync();
-          // Ignore deletion errors
-          // ignore: avoid_catches_without_on_clauses
-        } catch (_) {
-          // Ignore deletion errors
-        }
+  const maxAttempts = 5;
+  for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      await directory.delete(recursive: true);
+      return;
+    } on FileSystemException catch (_) {
+      if (attempt == maxAttempts - 1) {
+        rethrow;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+}
+
+Future<void> _cleanupTempWorkerFiles(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
+    return;
+  }
+
+  for (final entity in directory.listSync()) {
+    final name = path.basename(entity.path);
+    if (name.startsWith('.IsolateManagerWorker.')) {
+      if (entity is File && entity.existsSync()) {
+        await entity.delete();
       }
     }
   }
 }
 
-/// Cleans up temporary shared worker files generated during tests.
-/// These files are created by the generator and should be deleted.
-void _cleanupTempSharedWorkerFiles(String directory) {
-  if (!Directory(directory).existsSync()) {
+Future<void> _cleanupTempSharedWorkerFiles(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
     return;
   }
 
-  final files = Directory(directory).listSync();
-  for (final file in files) {
-    if (file is File) {
-      final fileName = path.basename(file.path);
-      // Match pattern: .IsolateManagerShared.*.dart
-      if (fileName.startsWith('.IsolateManagerShared.') &&
-          fileName.endsWith('.dart')) {
-        try {
-          file.deleteSync();
-          // Ignore deletion errors
-          // ignore: avoid_catches_without_on_clauses
-        } catch (_) {
-          // Ignore deletion errors
-        }
+  for (final entity in directory.listSync()) {
+    final name = path.basename(entity.path);
+    if (name.startsWith('.IsolateManagerShared.')) {
+      if (entity is File && entity.existsSync()) {
+        await entity.delete();
       }
     }
   }
