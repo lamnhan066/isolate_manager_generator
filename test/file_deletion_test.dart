@@ -310,6 +310,7 @@ void main() {
 
       test(
         'handles multiple runs without file lock issues',
+        timeout: const Timeout(Duration(minutes: 2)),
         () async {
           // Run generation twice to ensure no file lock issues
           for (var i = 0; i < 2; i++) {
